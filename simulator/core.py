@@ -112,7 +112,7 @@ def benchmark(conn, email=DEFAULT_EMAIL, samples=100, warmup=10):
         latencies.append((perf_counter_ns() - start) / 1_000_000)
         if rows != baseline:
             raise ValueError("Results changed during benchmark")
-    plan = conn.execute("EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) " + LOOKUP_SQL, (email,)).fetchone()[0]
+    plan = explain(conn, email)
     return {
         "email": email, "sample_count": samples, "warmup_count": warmup,
         "p50_ms": percentile(latencies, 50), "p95_ms": percentile(latencies, 95),
@@ -165,14 +165,31 @@ def verify(conn, email=DEFAULT_EMAIL, samples=100, warmup=10):
     before = benchmark(conn, email, samples, warmup)
     repair(conn)
     after = benchmark(conn, email, samples, warmup)
+    return {"before": before, "after": after, **compare_benchmarks(before, after)}
+
+
+def explain(conn, email=DEFAULT_EMAIL):
+    """Read-only plan evidence for the fixed checkout query."""
+    return conn.execute("EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) " + LOOKUP_SQL,
+                        (email,)).fetchone()[0]
+
+
+def inspect_schema(conn):
+    """Inspect only the demo table; return a bounded, non-textual summary."""
+    columns = conn.execute("""SELECT column_name FROM information_schema.columns
+        WHERE table_schema = 'sentinelops_demo' AND table_name = 'orders'""").fetchall()
+    return {"expected_columns_present": {"id", "customer_email", "status", "total_amount", "created_at"}
+            <= {row[0] for row in columns}, "demo_index_present": check_demo_index(conn)}
+
+
+def compare_benchmarks(before, after):
+    """Independent recovery criteria shared by CLI and incident agent."""
     identical = (before["result_sha256"], before["result_count"]) == (
         after["result_sha256"], after["result_count"])
     sequential_before = any(n["Node Type"] == "Seq Scan" for n in plan_nodes(before["plan"]))
     indexed_after = any(n.get("Index Name") == INDEX_NAME for n in plan_nodes(after["plan"]))
     improved = after["p95_ms"] < before["p95_ms"] and after["p50_ms"] < before["p50_ms"]
-    return {
-        "before": before, "after": after, "results_identical": identical,
-        "sequential_scan_before": sequential_before, "demo_index_used_after": indexed_after,
-        "latency_improved": improved, "p95_speedup": before["p95_ms"] / after["p95_ms"],
-        "verified": identical and sequential_before and indexed_after and improved,
-    }
+    return {"results_identical": identical, "sequential_scan_before": sequential_before,
+            "demo_index_used_after": indexed_after, "latency_improved": improved,
+            "p95_speedup": before["p95_ms"] / after["p95_ms"],
+            "verified": identical and sequential_before and indexed_after and improved}

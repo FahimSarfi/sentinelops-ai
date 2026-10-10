@@ -20,6 +20,8 @@ class IncidentStatus(str, Enum):
     RECOVERING = "recovering"
     RESOLVED = "resolved"
     FAILED = "failed"
+    ESCALATED = "escalated"
+    REJECTED = "rejected"
 
 
 class Incident(BaseModel):
