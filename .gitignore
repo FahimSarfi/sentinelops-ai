@@ -7,3 +7,16 @@ __pycache__/
 node_modules/
 .next/
 .sentinelops/
+
+.next-e2e/
+submission/
+
+# Private agent/session state and generated artifacts
+.codex/
+.entire/
+*.log
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+frontend/design-references/

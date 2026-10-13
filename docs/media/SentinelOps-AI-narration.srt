@@ -1,0 +1,31 @@
+1
+00:00:00,000 --> 00:00:11,858
+When checkout slows down, engineers need more than another alert. They need to understand what happened, what the evidence says, and what to do next.
+
+2
+00:00:11,858 --> 00:00:27,299
+Meet SentinelOps AI. An incident investigation prototype built around one focused workflow: investigate a slow PostgreSQL checkout query, propose a repair, and keep a human in control.
+
+3
+00:00:27,299 --> 00:00:41,862
+Start in a clean workspace. See the incident that needs attention, open its details, and follow the investigation. This product walkthrough uses a clearly labelled sample workspace.
+
+4
+00:00:41,862 --> 00:00:55,794
+Connect the performance signal with the query plan and schema. Inspect observations and supporting evidence before considering the proposed index repair. The goal is a decision you can explain.
+
+5
+00:00:55,794 --> 00:01:11,550
+A proposal is not permission. Review the repair and its risks, then approve or reject. Sample dashboard decisions are previews. Real execution goes through the local command line approval gate.
+
+6
+00:01:11,550 --> 00:01:26,712
+The backend checks performance before and after the allowlisted repair, and verifies that query results stay identical. Database integration tests cover recovery and rollback using a deterministic model stand in.
+
+7
+00:01:26,712 --> 00:01:42,788
+Explore the recorded timeline and evidence citation coverage. Export the report so others can review the observations and decisions. These analytics describe a loaded incident snapshot, not a live monitoring feed.
+
+8
+00:01:42,788 --> 00:01:57,246
+SentinelOps AI. Evidence before action. Human control by design. The prototype is ready to explore; live model and account flows still need separate verification.

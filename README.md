@@ -1,7 +1,18 @@
 # SentinelOps AI
 
-An incident response demo for neatHack 2026. The existing FastAPI app lives in
+Investigate a slow checkout query, gather real database evidence, require human
+approval, and verify recovery. A personal engineering portfolio project, originally built for neatHack 2026.
+
+Read the [User and evaluator manual](docs/USER-MANUAL.md) and [Usability review](docs/USABILITY-REVIEW.md).
+
+Start with [Demo runbook](docs/DEMO.md), [Submission](docs/SUBMISSION.md) and
+[Readiness](docs/READINESS.md). The dashboard sample is illustrative; real repairs
+use the local CLI. Google sign-in is integrated through Supabase; live account completion still needs verification.
+
+An incident response prototype under continuous development. The existing FastAPI app lives in
 `backend/app`; Milestone 4 adds an independent PostgreSQL checkout incident simulator.
+
+See [Production and continuous delivery](docs/PRODUCTION.md) for Docker setup and the hardening roadmap.
 
 ## Local setup
 
