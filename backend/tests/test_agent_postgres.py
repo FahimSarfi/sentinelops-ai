@@ -1,10 +1,10 @@
-"""Real PostgreSQL, deterministic model (not a live LLM), rollback-only DDL."""
+"""Real PostgreSQL with rollback-only DDL or a disposable committed database."""
 from contextlib import nullcontext
 
 import pytest
 
 from simulator import core
-from simulator.tests.test_postgres import db  # Shared opt-in, isolated rollback fixture.
+from simulator.tests.test_postgres import committed_db, db, postgres_connection
 from backend.app.agent_tools import DatabaseTools, metrics_summary, plan_summary
 from backend.app.agent import Agent
 from backend.app.agent_state import Store
@@ -52,8 +52,8 @@ def test_failed_verification_rolls_back_index(db, monkeypatch):
     assert not core.check_demo_index(db)
 
 
-def test_production_read_tools_on_local_database(db):
-    # Separate production connections use real read-only transactions; no fixture writes.
+def test_production_read_tools_on_local_database(committed_db):
+    # Seed is committed in an isolated database, visible to production connections.
     tools = DatabaseTools()
     assert tools.read("metrics")["result_count"] == 10
     assert isinstance(tools.read("explain")["sequential_scan"], bool)
