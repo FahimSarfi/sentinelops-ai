@@ -126,8 +126,13 @@ SENTINELOPS_TEST_POSTGRES=1 python -m pytest -q -rs
 The integration tests cover seeding, measured before/after performance, identical
 lookup results, actual planner index use, idempotency, restoring the sequential
 scan, SQL parameterization, index-name collision protection, and preservation of
-rows and unrelated indexes. They run in rollback-only transactions, restoring the
-prior database state after each test. When opted in but credentials or the local
+rows and unrelated indexes. Mutation tests run in rollback-only transactions,
+restoring the prior database state after each test. The production read-tools
+test needs committed data visible across connections: it creates a unique temporary
+database, commits synthetic seed data there, and drops that database in teardown,
+including after a test failure. The local test role therefore needs `CREATEDB`
+(the CI PostgreSQL service role already has it). It never seeds or resets the
+existing demo database. When opted in but credentials or the local
 test database are unavailable, they skip with a clear reason. Schema errors and
 failed performance/correctness assertions fail rather than silently skipping.
 These tests mutate the demo schema temporarily: use only this isolated fixture.
@@ -221,7 +226,8 @@ SENTINELOPS_TEST_POSTGRES=1 python -m pytest -q -rs
 
 Agent unit tests use deterministic models, including observation-dependent tool
 selection. Opt-in agent database tests use real benchmarks and rollback-only
-transactions with a deterministic model; they are **not live LLM validation**.
+transactions with a deterministic model; the production read-tools test uses a
+disposable committed database. They are **not live LLM validation**.
 Live provider success must be demonstrated separately using the interactive demo
 with a configured provider and a genuinely degraded fixture.
 
