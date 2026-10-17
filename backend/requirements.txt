@@ -2,7 +2,7 @@
 fastapi>=0.115,<1
 pydantic>=2,<3
 httpx>=0.28,<1
-uvicorn>=0.30,<1
+uvicorn>=0.54.0,<1
 pytest>=8,<10
 
 # Supported Neatlogs OTLP transport; compatible with Python 3.14.
